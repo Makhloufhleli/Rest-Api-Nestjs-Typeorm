@@ -3,7 +3,7 @@ import { User } from '@Models/entities/User';
 
 @Entity()
 export class Session {
-  constructor(userAgent?: string, ipAddress?: string, user?: User, token?: string) {
+  constructor(userAgent: string, ipAddress: string, user: User, token: string) {
     this.userAgent = userAgent;
     this.ipAddress = ipAddress;
     this.user = user;
@@ -15,7 +15,7 @@ export class Session {
   userAgent: string;
   @Column()
   ipAddress: string;
-  @Column()
+  @Column({type: 'text'})
   token: string;
   @Column({ default: false })
   isExpired: boolean;
