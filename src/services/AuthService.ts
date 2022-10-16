@@ -1,4 +1,3 @@
-import { NotFoundException } from '@Exceptions/NotFoundException';
 import { Injectable } from '@nestjs/common';
 import { UserService } from '@Services/UserService';
 import { BadRequestException } from '@Exceptions/BadRequestException';
@@ -44,10 +43,11 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string } | undefined> {
     const user = await this.userService.getUserByEmail(email);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new BadRequestException('Invalid  login or password');
     }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     // verify your user password
-    if (!bcrypt.compare(user.password, password)) {
+    if (!isPasswordValid) {
       throw new BadRequestException('Invalid  login or password');
     }
 
