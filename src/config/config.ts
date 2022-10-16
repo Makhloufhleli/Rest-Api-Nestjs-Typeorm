@@ -8,14 +8,17 @@ const serverConfig = {
   port: process.env.APP_ENV === 'development' ? process.env.SERVER_PORT : 8080,
 }
 
-const mysqlDatabaseConfig: DataSourceOptions = {
+const mysqlDatabaseConfig: DataSourceOptions= {
   type: 'mysql',
   host: process.env.MYSQL_HOST || 'localhost',
   port: parseInt(process.env.MYSQL_PORT, 10) || 3306,
   username: process.env.MYSQL_USERNAME || 'root',
   password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DATABASE || 'nest_dev',
+  synchronize: true,
 }
+
+const databaseConfig = process.env.DATABASE_TYPE === 'mysql' ? mysqlDatabaseConfig : null;
 
 const openApiConfig = {
   title: process.env.API_TITLE || 'Test API',
@@ -32,4 +35,4 @@ const openApiAuthConfig: SecuritySchemeObject = {
   in: process.env.API_AUTH_IN || 'header',
 };
 
-export { serverConfig, mysqlDatabaseConfig, openApiConfig, openApiAuthConfig };
+export { serverConfig, databaseConfig, openApiConfig, openApiAuthConfig };
