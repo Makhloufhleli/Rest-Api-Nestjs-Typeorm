@@ -5,6 +5,7 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  TableInheritance,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRoles } from '../enums/UserRoles';
@@ -12,6 +13,7 @@ import { Session } from '@Models/entities/Session';
 import { File } from '@Models/entities/File';
 
 @Entity()
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export class User {
   @PrimaryGeneratedColumn()
   id!: number;
