@@ -10,12 +10,19 @@ export class DeveloperTechnologies {
   @PrimaryColumn()
   developerId: number;
 
-  @ManyToOne(() => Technology, (technology) => technology.developers)
-  @JoinColumn()
+  @ManyToOne(() => Technology, (technology) => technology.developers, {
+    cascade: true,
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'technologyId' })
   technology!: Technology;
 
-  @ManyToOne(() => Developer, (developer) => developer.technologies)
-  @JoinColumn()
+  @ManyToOne(() => Developer, (developer) => developer.technologies, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'developerId' })
   developer!: Developer;
 
   @Column()

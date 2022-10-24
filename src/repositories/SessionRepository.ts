@@ -21,6 +21,10 @@ export class SessionRepository extends Repository<Session> {
   }
 
   async existsSessionByToken(token: string): Promise<boolean> {
-    return await this.createQueryBuilder('session').where('session.token = :token', { token }).getCount() > 0;
+    return (
+      (await this.createQueryBuilder('session')
+        .where('session.token = :token', { token })
+        .getCount()) > 0
+    );
   }
 }
