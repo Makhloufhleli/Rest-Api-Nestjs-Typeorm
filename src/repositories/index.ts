@@ -3,7 +3,6 @@ import { SessionRepository } from '@src/repositories/SessionRepository';
 import { DeveloperRepository } from '@src/repositories/DeveloperRepository';
 import { ManagerRepository } from '@src/repositories/ManagerRepository';
 import { TechnologyRepository } from '@src/repositories/TechnologyRepository';
-import { DeveloperTechnologiesRepository } from '@src/repositories/DeveloperTechnologiesRepository';
 
 export const Repositories = [
   UserRepository,
@@ -11,5 +10,4 @@ export const Repositories = [
   DeveloperRepository,
   ManagerRepository,
   TechnologyRepository,
-  DeveloperTechnologiesRepository,
 ];
