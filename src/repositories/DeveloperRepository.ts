@@ -9,7 +9,6 @@ export class DeveloperRepository extends Repository<Developer> {
   }
 
   async updateDeveloper(id: number, developer: Developer): Promise<Developer> {
-    console.log(developer);
     await this.save(developer);
     return await this.getDeveloperDetails(id);
   }
@@ -17,8 +16,9 @@ export class DeveloperRepository extends Repository<Developer> {
   async getDeveloperDetails(id: number): Promise<Developer> {
     return await this.createQueryBuilder('developer')
       .leftJoinAndSelect('developer.technologies', 'technologies')
+      .leftJoinAndSelect('technologies.technology', 'technology')
       .leftJoinAndSelect('developer.projects', 'projects')
-      .where('id = :id', { id })
+      .where('developer.id = :id', { id })
       .getOne();
   }
 }
