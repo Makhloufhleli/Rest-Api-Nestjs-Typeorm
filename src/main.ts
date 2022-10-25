@@ -13,11 +13,11 @@ class Application {
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
     const options = new DocumentBuilder()
-    .setTitle(openApiConfig.title)
-    .setDescription(openApiConfig.description)
-    .setVersion(openApiConfig.version)
-    .addBearerAuth(openApiAuthConfig)
-    .build();
+      .setTitle(openApiConfig.title)
+      .setDescription(openApiConfig.description)
+      .setVersion(openApiConfig.version)
+      .addBearerAuth(openApiAuthConfig)
+      .build();
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('api-docs', app, document);
     await app.listen(serverConfig.port);

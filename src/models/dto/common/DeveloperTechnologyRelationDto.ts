@@ -1,14 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt } from 'class-validator';
-import { Constants } from '@Constants/Constants';
 
-export class RelationIdDto {
+export class DeveloperTechnologyRelationDto {
   @ApiProperty({
     minimum: 1,
-    default: Constants.EMPTY_STRING,
+    default: null,
   })
-  @Type(() => String)
+  @Type(() => Number)
   @IsInt()
-  id: number;
+  technologyId: number;
+
+  yearsOfE;
 }
