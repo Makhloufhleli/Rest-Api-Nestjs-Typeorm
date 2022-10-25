@@ -1,5 +1,5 @@
 import { Session } from '@Models/entities/Session';
-import { DataSource, DeleteResult, Repository } from 'typeorm';
+import { DataSource, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -8,20 +8,23 @@ export class SessionRepository extends Repository<Session> {
     super(Session, dataSource.createEntityManager());
   }
   async createSession(session: Session): Promise<Session> {
-    return this.create(session);
-  }
-  async updateSession(session: Session): Promise<Session> {
     return this.save(session);
+  }
+  async updateSession(id: number, session: Session): Promise<UpdateResult> {
+    return this.update(id, session);
   }
   async deleteSession(id: number): Promise<DeleteResult> {
     return this.delete(id);
   }
-
-  async getSessionById(id: number): Promise<Session> {
-    return this.createQueryBuilder('session').where('session.id = :id', { id }).getOne();
-  }
-
   async getSessionByToken(token: string): Promise<Session> {
     return this.createQueryBuilder('session').where('session.token = :token', { token }).getOne();
+  }
+
+  async existsSessionByToken(token: string): Promise<boolean> {
+    return (
+      (await this.createQueryBuilder('session')
+        .where('session.token = :token', { token })
+        .getCount()) > 0
+    );
   }
 }

@@ -9,19 +9,20 @@ import { Repositories } from '@src/repositories';
 import { Services } from '@src/services';
 import { Entities } from '@Models/entities';
 
-@Module( {
-  imports: [ ConfigModule.forRoot(), TypeOrmModule.forRoot( {
-    ...databaseConfig,
-    autoLoadEntities: true
-  } ),
-    PassportModule.register( { defaultStrategy: 'jwt' } ),
-    JwtModule.register( {
+@Module({
+  imports: [
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRoot({
+      ...databaseConfig,
+      autoLoadEntities: true,
+    }),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.register({
       secret: process.env.ACCESS_TOKEN_SECRET,
-    } ),
-    TypeOrmModule.forFeature( [ ...Entities ] ),
+    }),
+    TypeOrmModule.forFeature([...Entities]),
   ],
-  controllers: [ ...Controllers ],
-  providers: [ ...Services, ...Repositories ],
-} )
-export class AppModule {
-}
+  controllers: [...Controllers],
+  providers: [...Services, ...Repositories],
+})
+export class AppModule {}

@@ -1,4 +1,3 @@
-import { NotFoundException } from '@Exceptions/NotFoundException';
 import { Injectable } from '@nestjs/common';
 import { UserService } from '@Services/UserService';
 import { BadRequestException } from '@Exceptions/BadRequestException';
@@ -15,28 +14,23 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly sessionRepository: SessionRepository,
   ) {}
-
   async refresh(refreshStr: string): Promise<string | undefined> {
     const refreshToken = await this.retrieveRefreshToken(refreshStr);
     if (!refreshToken) {
       return undefined;
     }
-
     const user = await this.userService.getUserById(refreshToken.user.id);
     if (!user) {
       return undefined;
     }
-
     const accessToken = {
       user: refreshToken.user,
     };
-
     return this.jwtService.sign(accessToken, {
       expiresIn: process.env.ACCESS_TOKEN_TIME_TO_LEAVE,
       algorithm: 'HS256',
     });
   }
-
   async login(
     email: string,
     password: string,
@@ -44,33 +38,44 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string } | undefined> {
     const user = await this.userService.getUserByEmail(email);
     if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    // verify your user password
-    if (!bcrypt.compare(user.password, password)) {
       throw new BadRequestException('Invalid  login or password');
     }
-
+    // verify your user password
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new BadRequestException('Invalid  login or password');
+    }
+    // Create tokens
     const tokens = await this.signRefreshAndAccessToken(user);
-    const session = new Session(values.userAgent, values.ipAddress, user, tokens.refreshToken);
-    const isSessionRegistered = await this.sessionRepository.getSessionByToken(tokens.refreshToken);
-    if (!isSessionRegistered) {
+    // check if session exists
+    const isConnected = await this.sessionRepository.existsSessionByToken(tokens.refreshToken);
+    // save the session in the database if it does not exist or update it if it exists
+    if (!isConnected) {
+      // instanciate a new session
+      const session: Session = new Session(
+        values.userAgent,
+        values.ipAddress,
+        user,
+        tokens.refreshToken,
+      );
       await this.sessionRepository.createSession(session);
     } else {
-      await this.sessionRepository.updateSession(session);
+      // Fix this logic by getting refresh token from request and check on it
+      const registeredSession: Session = await this.sessionRepository.getSessionByToken(
+        tokens.refreshToken,
+      );
+      registeredSession.token = tokens.refreshToken;
+      await this.sessionRepository.updateSession(registeredSession.id, registeredSession);
     }
+    // return tokens
     return tokens;
   }
-
   async logout(refreshStr: string): Promise<void> {
     const refreshToken = await this.retrieveRefreshToken(refreshStr);
-
     if (!refreshToken) {
       return;
     }
     // delete refreshtoken from db
   }
-
   async signRefreshAndAccessToken(
     user: User,
   ): Promise<{ accessToken: string; user: User; refreshToken: string }> {
@@ -94,7 +99,6 @@ export class AuthService {
       refreshToken,
     };
   }
-
   async retrieveRefreshToken(refreshStr: string): Promise<Session | undefined> {
     try {
       const decoded = this.jwtService.verify(refreshStr);
