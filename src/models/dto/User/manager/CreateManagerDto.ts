@@ -1,15 +1,11 @@
-import {
-  IsEmail,
-  IsOptional,
-  IsString,
-  Matches,
-} from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsDefined, IsEmail, IsEnum, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { Constants, PASSWORD_REGEX } from 'src/constants/Constants';
-import { Match } from 'src/middlewares/Match';
+import { Constants, PASSWORD_REGEX } from '@Constants/Constants';
+import { Match } from '@Middlewares/Match';
+import { ManagersPositions } from '@Models/enums/ManagersPositions';
 
-export class CreateUserDto {
+export class CreateManagerDto {
   @ApiProperty({
     minimum: 3,
     default: Constants.EMPTY_STRING,
@@ -17,6 +13,8 @@ export class CreateUserDto {
   })
   @Type(() => String)
   @IsString()
+  @IsDefined()
+  @IsNotEmpty()
   firstName!: string;
 
   @ApiProperty({
@@ -26,6 +24,8 @@ export class CreateUserDto {
   })
   @Type(() => String)
   @IsString()
+  @IsDefined()
+  @IsNotEmpty()
   lastName!: string;
 
   @ApiProperty({
@@ -35,6 +35,8 @@ export class CreateUserDto {
   })
   @Type(() => String)
   @IsString()
+  @IsDefined()
+  @IsNotEmpty()
   username: string;
 
   @ApiProperty({
@@ -48,6 +50,8 @@ export class CreateUserDto {
     message:
       'Password shuld contains at least one character uppercase, one character lowercase, one number and one special character and one number',
   })
+  @IsDefined()
+  @IsNotEmpty()
   password!: string;
 
   @ApiProperty({
@@ -58,6 +62,8 @@ export class CreateUserDto {
   @Type(() => String)
   @IsString()
   @Match('password', { message: 'Passwords do not match' })
+  @IsDefined()
+  @IsNotEmpty()
   passwordConfirmation!: string;
 
   @ApiProperty({
@@ -66,6 +72,13 @@ export class CreateUserDto {
   })
   @Type(() => String)
   @IsEmail()
-  @IsOptional()
+  @IsDefined()
+  @IsNotEmpty()
   email!: string;
+
+  @ApiPropertyOptional({ enum: ManagersPositions, default: ManagersPositions.PROJECT_MANAGER })
+  @IsEnum(ManagersPositions)
+  @IsDefined()
+  @IsNotEmpty()
+  position: string;
 }

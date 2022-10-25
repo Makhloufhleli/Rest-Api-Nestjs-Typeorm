@@ -1,10 +1,13 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  TableInheritance,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRoles } from '../enums/UserRoles';
@@ -12,43 +15,59 @@ import { Session } from '@Models/entities/Session';
 import { File } from '@Models/entities/File';
 
 @Entity()
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
+@Unique(['username', 'email'])
 export class User {
   @PrimaryGeneratedColumn()
   id!: number;
+
   @Column()
   firstName!: string;
+
   @Column()
   lastName!: string;
-  @Column()
+
+  @Column({ unique: true })
   username: string;
+
   @Column()
   password!: string;
-  @Column()
+
+  @Column({ unique: true })
   email!: string;
+
   @Column({
     default: UserRoles.ROLE_USER,
     enum: UserRoles,
     type: 'enum',
   })
   role!: UserRoles;
+
   @OneToOne(() => File, (file) => file.userAvatar, {
     cascade: true,
     nullable: true,
   })
   photo!: File;
+
   @OneToOne(() => File, (file) => file.userBackground, {
     cascade: true,
     nullable: true,
   })
   cv!: File;
+
   @OneToMany(() => Session, (session) => session.user)
   sessions: Array<Session>;
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
-  public createdAt: Date;
+  createdAt: Date;
+
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
-  public updatedAt: Date;
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt!: Date;
 }
