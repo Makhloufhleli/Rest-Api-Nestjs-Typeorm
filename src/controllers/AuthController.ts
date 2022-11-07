@@ -24,10 +24,10 @@ export class AuthController {
   @ApiOperation({
     summary: 'Login a user (save a new session and returns access and refresh tokens)',
   })
-  async login(@Req() request, @Ip() ip: string, @Body() body: LoginDto) {
+  async login(@Req() request, @Ip() ip: string, @Body() loginDto: LoginDto) {
     return ResponseEntity.OK(
       'Login successful',
-      await this.authService.login(body.email, body.password, {
+      await this.authService.login(loginDto.email, loginDto.password, {
         ipAddress: ip,
         userAgent: request.headers['user-agent'],
       }),

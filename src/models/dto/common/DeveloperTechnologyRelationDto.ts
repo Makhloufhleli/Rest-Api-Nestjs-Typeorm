@@ -11,5 +11,5 @@ export class DeveloperTechnologyRelationDto {
   @IsInt()
   technologyId: number;
 
-  yearsOfE;
+  yearsOfExperience: number;
 }

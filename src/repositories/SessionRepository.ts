@@ -20,11 +20,10 @@ export class SessionRepository extends Repository<Session> {
     return this.createQueryBuilder('session').where('session.token = :token', { token }).getOne();
   }
 
-  async existsSessionByToken(token: string): Promise<boolean> {
-    return (
-      (await this.createQueryBuilder('session')
-        .where('session.token = :token', { token })
-        .getCount()) > 0
-    );
+  async getSessionByUserEmail(email: string): Promise<Session> {
+    return await this.createQueryBuilder('session')
+      .leftJoinAndSelect('session.user', 'user')
+      .where('user.email = :email', { email })
+      .getOne();
   }
 }

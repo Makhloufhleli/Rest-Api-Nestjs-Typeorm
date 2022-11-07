@@ -27,7 +27,7 @@ export class AuthService {
       user: refreshToken.user,
     };
     return this.jwtService.sign(accessToken, {
-      expiresIn: process.env.ACCESS_TOKEN_TIME_TO_LEAVE,
+      expiresIn: process.env.ACCESS_TOKEN_TIME_TO_LIVE,
       algorithm: 'HS256',
     });
   }
@@ -44,13 +44,34 @@ export class AuthService {
     if (!(await bcrypt.compare(password, user.password))) {
       throw new BadRequestException('Invalid  login or password');
     }
-    // Create tokens
-    const tokens = await this.signRefreshAndAccessToken(user);
+    // Check if user already have session
+    const userSession = await this.sessionRepository.getSessionByUserEmail(email);
+    // check if user have session and the session is not expired
+    if (userSession.isExpired) {
+      // in case session expired
+      // Create tokens
+      const tokens = await this.signRefreshAndAccessToken(user);
+      // instantiate a new session
+      const session: Session = new Session(
+        values.userAgent,
+        values.ipAddress,
+        user,
+        tokens.refreshToken,
+      );
+      // save session
+      await this.sessionRepository.createSession(session);
+      // return tokens
+      return tokens;
+    } else {
+      // refresh token
+    }
+
+    /* 
     // check if session exists
     const isConnected = await this.sessionRepository.existsSessionByToken(tokens.refreshToken);
     // save the session in the database if it does not exist or update it if it exists
     if (!isConnected) {
-      // instanciate a new session
+      // instantiate a new session
       const session: Session = new Session(
         values.userAgent,
         values.ipAddress,
@@ -65,9 +86,8 @@ export class AuthService {
       );
       registeredSession.token = tokens.refreshToken;
       await this.sessionRepository.updateSession(registeredSession.id, registeredSession);
-    }
+    } */
     // return tokens
-    return tokens;
   }
   async logout(refreshStr: string): Promise<void> {
     const refreshToken = await this.retrieveRefreshToken(refreshStr);
@@ -82,14 +102,14 @@ export class AuthService {
     const accessToken = this.jwtService.sign(
       { ...user },
       {
-        expiresIn: process.env.REFRESH_TOKEN_TIME_TO_LEAVE,
+        expiresIn: process.env.ACCESS_TOKEN_TIME_TO_LIVE,
         algorithm: 'HS256',
       },
     );
     const refreshToken = this.jwtService.sign(
       { ...user },
       {
-        expiresIn: process.env.ACCESS_TOKEN_TIME_TO_LEAVE,
+        expiresIn: process.env.REFRESH_TOKEN_TIME_TO_LIVE,
         algorithm: 'HS256',
       },
     );
@@ -101,7 +121,7 @@ export class AuthService {
   }
   async retrieveRefreshToken(refreshStr: string): Promise<Session | undefined> {
     try {
-      const decoded = this.jwtService.verify(refreshStr);
+      const decoded = await this.jwtService.verify(refreshStr);
       if (typeof decoded === 'string') {
         return undefined;
       }

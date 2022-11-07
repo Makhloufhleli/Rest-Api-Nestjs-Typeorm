@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { User } from '@Models/entities/User';
 import { PaginationParamsDto } from '@Models/dto/pagination/PaginationParamsDto';
 import { Pagination } from '@Models/dto/pagination/Pagination';
@@ -84,10 +84,10 @@ export class UserService {
 
   private async checkUniqueCredentials(username: string, email: string) {
     if (await this.userRepository.existsByEmail(email)) {
-      throw new BadRequestException('Email already exists');
+      throw new ConflictException('Email already exists');
     }
     if (await this.userRepository.existsByUsername(username)) {
-      throw new BadRequestException('Username already exists');
+      throw new ConflictException('Username already exists');
     }
   }
 }

@@ -13,6 +13,7 @@ import {
 import { UserRoles } from '../enums/UserRoles';
 import { Session } from '@Models/entities/Session';
 import { File } from '@Models/entities/File';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
@@ -31,6 +32,7 @@ export class User {
   username: string;
 
   @Column()
+  @Exclude({ toPlainOnly: true })
   password!: string;
 
   @Column({ unique: true })

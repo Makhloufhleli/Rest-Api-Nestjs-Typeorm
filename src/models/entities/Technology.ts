@@ -30,11 +30,9 @@ export class Technology {
   @OneToMany(() => ProjectTechnologies, (projectTechnologies) => projectTechnologies.technology)
   projects: Array<ProjectTechnologies>;
 
-  @Exclude({ toPlainOnly: true })
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
   createdAt: Date;
 
-  @Exclude({ toPlainOnly: true })
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',

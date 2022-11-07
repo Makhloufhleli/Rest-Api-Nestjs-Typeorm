@@ -1,4 +1,5 @@
 import { PassportStrategy } from '@nestjs/passport';
+import { User } from '@Models/entities/User';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -6,13 +7,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.ACCES_TOKEN_SECRET,
+      secretOrKey: process.env.ACCESS_TOKEN_SECRET,
     });
   }
 
-  validate(payload: { userId: number }) {
-    return {
-      userId: payload.userId,
-    };
+  validate(payload: { user: User }) {
+    return payload.user;
   }
 }

@@ -9,6 +9,7 @@ import {
   Delete,
   Param,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from '@Services/UserService';
 import { CreateManagerDto } from '@Models/dto/User/manager/CreateManagerDto';
@@ -18,6 +19,7 @@ import { CreateDeveloperDto } from '@Models/dto/User/developer/CreateDeveloperDt
 import { ResponseEntity } from '@Models/dto/response/ResponseEntity';
 import { UpdateManagerDto } from '@Models/dto/User/manager/UpdateManagerDto';
 import { UpdateDeveloperDto } from '@Models/dto/User/developer/UpdateDeveloperDto';
+import { JwtAuthGuard } from '../security/guards/JwtGuard';
 
 @ApiTags('users')
 @Controller('users')
@@ -29,6 +31,7 @@ export class UserController {
    *
    * @param params
    */
+  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'get list of all registered users in the database with pagination' })
   async findAll(@Query() params: PaginationParamsDto) {
@@ -58,6 +61,7 @@ export class UserController {
    *
    * @param developer
    */
+
   @Post('developer')
   @ApiOperation({ summary: 'Save new developer in the database' })
   async createDeveloper(@Body() developer: CreateDeveloperDto) {

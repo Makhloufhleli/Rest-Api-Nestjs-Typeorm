@@ -1,4 +1,12 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { User } from '@Models/entities/User';
 
 @Entity()
@@ -15,10 +23,23 @@ export class Session {
   userAgent: string;
   @Column()
   ipAddress: string;
-  @Column({type: 'text'})
+  @Column({ type: 'text' })
   token: string;
   @Column({ default: false })
   isExpired: boolean;
   @ManyToOne(() => User, (user) => user.sessions)
   user: User;
+
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
+  createdAt: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt!: Date;
 }
