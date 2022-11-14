@@ -1,15 +1,15 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Query,
-  UseInterceptors,
   ClassSerializerInterceptor,
+  Controller,
   Delete,
+  Get,
   Param,
   Patch,
+  Post,
+  Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from '@Services/UserService';
 import { CreateManagerDto } from '@Models/dto/User/manager/CreateManagerDto';
@@ -19,7 +19,10 @@ import { CreateDeveloperDto } from '@Models/dto/User/developer/CreateDeveloperDt
 import { ResponseEntity } from '@Models/dto/response/ResponseEntity';
 import { UpdateManagerDto } from '@Models/dto/User/manager/UpdateManagerDto';
 import { UpdateDeveloperDto } from '@Models/dto/User/developer/UpdateDeveloperDto';
-import { JwtAuthGuard } from '../security/guards/JwtGuard';
+import { AccessTokenGuard } from '@Security/guards/AccessTokenGuard';
+import { Public } from '@src/Decorators/Public';
+import { AuthorizeWithRoles } from '@src/Decorators/AuthorizeWithRoles';
+import { UserRoles } from '@Models/enums/UserRoles';
 
 @ApiTags('users')
 @Controller('users')
@@ -31,13 +34,14 @@ export class UserController {
    *
    * @param params
    */
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AccessTokenGuard)
   @Get()
   @ApiOperation({ summary: 'get list of all registered users in the database with pagination' })
   async findAll(@Query() params: PaginationParamsDto) {
     return ResponseEntity.OK('Successfully fetched', await this.usersService.getAllUsers(params));
   }
 
+  @AuthorizeWithRoles(UserRoles.ROLE_ADMIN)
   @Get(':id')
   @ApiOperation({ summary: 'get user details' })
   async getUserDetails(@Param('id') id: number) {
@@ -48,6 +52,7 @@ export class UserController {
    *
    * @param manager
    */
+  @Public()
   @Post('manager')
   @ApiOperation({ summary: 'Save new manager in the database' })
   async createManager(@Body() manager: CreateManagerDto) {
@@ -61,7 +66,7 @@ export class UserController {
    *
    * @param developer
    */
-
+  @Public()
   @Post('developer')
   @ApiOperation({ summary: 'Save new developer in the database' })
   async createDeveloper(@Body() developer: CreateDeveloperDto) {

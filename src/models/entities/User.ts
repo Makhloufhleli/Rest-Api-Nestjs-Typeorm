@@ -60,9 +60,11 @@ export class User {
   @OneToMany(() => Session, (session) => session.user)
   sessions: Array<Session>;
 
+  @Exclude({ toPlainOnly: true })
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
   createdAt: Date;
 
+  @Exclude({ toPlainOnly: true })
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
@@ -70,6 +72,7 @@ export class User {
   })
   updatedAt: Date;
 
+  @Exclude({ toPlainOnly: true })
   @DeleteDateColumn()
   deletedAt!: Date;
 }

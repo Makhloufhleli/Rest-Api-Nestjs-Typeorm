@@ -23,7 +23,7 @@ export class Session {
   userAgent: string;
   @Column()
   ipAddress: string;
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   token: string;
   @Column({ default: false })
   isExpired: boolean;

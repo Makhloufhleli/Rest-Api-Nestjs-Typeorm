@@ -4,15 +4,22 @@ import {
   Controller,
   Delete,
   Ip,
+  Patch,
   Post,
   Req,
+  UseGuards,
   UseInterceptors,
+  Request,
 } from '@nestjs/common';
 import { AuthService } from '@Services/AuthService';
 import { LoginDto } from '@Models/dto/auth/LoginDto';
-import { RefreshTokenDto } from '@Models/dto/auth/RefreshTokenDto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ResponseEntity } from '@Models/dto/response/ResponseEntity';
+import { Public } from '@src/Decorators/Public';
+import { GetCurrentUserId } from '@src/Decorators/GetCurrentUserId';
+import { AccessTokenGuard } from '@Security/guards/AccessTokenGuard';
+import { RefreshTokenGuard } from '@Security/guards/RefreshTokenGuard';
+import { GetCurrentUser } from '@src/Decorators/GetCurrentUser';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -20,6 +27,7 @@ import { ResponseEntity } from '@Models/dto/response/ResponseEntity';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('login')
   @ApiOperation({
     summary: 'Login a user (save a new session and returns access and refresh tokens)',
@@ -34,18 +42,27 @@ export class AuthController {
     );
   }
 
-  @Post('refresh')
-  @ApiOperation({ summary: 'Refresh access token based on refresh token when token expires' })
-  async refreshToken(@Body() body: RefreshTokenDto) {
+  @UseGuards(AccessTokenGuard)
+  @Delete('logout')
+  @ApiOperation({ summary: 'Expire refresh token and logout user' })
+  async logout(@Req() request: Request, @GetCurrentUserId() userId: number) {
     return ResponseEntity.OK(
-      'Refresh successful',
-      await this.authService.refresh(body.refreshToken),
+      'Logout successful',
+      await this.authService.logout(userId, request.headers['user-agent']),
     );
   }
 
-  @Delete('logout')
-  @ApiOperation({ summary: 'Expire refresh token and logout user' })
-  async logout(@Body() body: RefreshTokenDto) {
-    return ResponseEntity.OK('Logout successful', await this.authService.logout(body.refreshToken));
+  @Public()
+  @UseGuards(RefreshTokenGuard)
+  @Patch('refresh')
+  async refreshTokens(
+    @Req() request: Request,
+    @GetCurrentUserId() userId: number,
+    @GetCurrentUser('refreshToken') refreshToken: string,
+  ) {
+    return ResponseEntity.OK(
+      'successfully refreshed',
+      await this.authService.refreshTokens(userId, request.headers['user-agent'], refreshToken),
+    );
   }
 }

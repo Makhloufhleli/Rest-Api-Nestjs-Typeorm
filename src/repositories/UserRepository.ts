@@ -88,6 +88,10 @@ export class UserRepository extends Repository<User> {
     return this.createQueryBuilder('user').softDelete().where('user.id = :id', { id }).execute();
   }
 
+  /**
+   * Restore soft deleted user
+   * @param id
+   */
   async restoreUser(id: number): Promise<UpdateResult> {
     return await this.createQueryBuilder('user')
       .update()

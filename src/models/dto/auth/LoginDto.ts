@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Constants, PASSWORD_REGEX } from '@Constants/Constants';
+import { Constants } from '@Constants/Constants';
 import { Type } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class LoginDto {
   @ApiProperty({
@@ -21,10 +21,6 @@ export class LoginDto {
   })
   @Type(() => String)
   @IsString()
-  @Matches(PASSWORD_REGEX, {
-    message:
-      'Invalid password or email',
-  })
   @IsNotEmpty()
   password: string;
 }
